@@ -62,12 +62,14 @@ void* malloc(size_t bytes) {
   } else {
     /* Resize the heap: Accommodate overflow and double */
     size_t new_size = (_top + bytes) * 2;
+    void* old_mem = _mem;
     _mem = _realloc(_mem, new_size);
-    if (_mem) {
+    if (_mem == old_mem) {
       _size = new_size;
       (void)pthread_spin_unlock(&_lock);
       return malloc(bytes);
     } else {
+      /* Fail if realloc moves memory around or fails itself */
       _size = 0;
       _top  = 0;
       (void)pthread_spin_unlock(&_lock);

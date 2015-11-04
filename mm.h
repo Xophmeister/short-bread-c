@@ -1,5 +1,6 @@
 #ifndef _MM_H
 #define _MM_H
+#include <stddef.h>
 
 int   mem_init(size_t);
 void  mem_nuke(void);
