@@ -1,11 +1,10 @@
 #ifdef __APPLE__
-
 /* Spinlocks for OS X; adapted from
    https://idea.popcount.org/2012-09-12-reinventing-spinlocks */
 
 #include <errno.h>
 #include <sched.h>
-#include "spinlock-osx.h"
+#include "spinlock-shim.h"
 
 int pthread_spin_init(pthread_spinlock_t* lock, int pshared) {
   (void)pshared;
@@ -21,8 +20,7 @@ int pthread_spin_destroy(pthread_spinlock_t* lock) {
 
 int pthread_spin_lock(pthread_spinlock_t* lock) {
   while (1) {
-    int i;
-    for (i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; i++) {
       if (__sync_bool_compare_and_swap(lock, 0, 1)) {
         return 0;
       }

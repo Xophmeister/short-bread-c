@@ -1,6 +1,8 @@
-#ifndef _SPINLOCK_OSX_H
-#define _SPINLOCK_OSX_H
-#ifdef __APPLE__
+#ifndef _SPINLOCK_SHIM_H
+#define _SPINLOCK_SHIM_H
+
+#include <pthread.h>
+
 typedef int pthread_spinlock_t;
 
 #ifndef PTHREAD_PROCESS_SHARED
@@ -16,5 +18,5 @@ int pthread_spin_destroy(pthread_spinlock_t*);
 int pthread_spin_lock(pthread_spinlock_t*);
 int pthread_spin_trylock(pthread_spinlock_t*);
 int pthread_spin_unlock(pthread_spinlock_t*);
-#endif
+
 #endif

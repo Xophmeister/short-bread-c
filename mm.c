@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mm.h"
-#include "spinlock-osx.h"
+
+#ifdef __APPLE__
+#include "spinlock-shim.h"
+#endif
 
 static void*              _mem;
 static size_t             _size;
