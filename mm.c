@@ -47,6 +47,38 @@ int mem_init(size_t bytes) {
   return ret;
 }
 
+#ifdef DEBUG
+#include <stdio.h>
+#include <ctype.h>
+#define DUMP_WIDTH 16
+
+void mem_dump(FILE* stream) {
+  (void)pthread_spin_lock(&_lock);
+  
+  char ascii[DUMP_WIDTH + 1] = {0};
+
+  (void)fprintf(stream,
+    "Memory Allocated: %zu bytes at %p\n"
+    "High Watermark:   %zu bytes (%p)\n\n",
+    _size, _mem, _top, (char*)_mem + _top
+  );
+
+  for (size_t i = 0; i < _size; i++) {
+    if (i % DUMP_WIDTH == 0) {
+      if (i) { (void)fprintf(stream, "  %s\n", ascii); }
+      (void)fprintf(stream, "%08zu ", i);
+    }
+    unsigned char current = *(unsigned char*)((char*)_mem + i);
+    (void)fprintf(stream, " %02x", current);
+    ascii[i % DUMP_WIDTH] = isprint(current) ? current : '.';
+  }
+  int padding = 3 * ((DUMP_WIDTH - (_size % DUMP_WIDTH)) % DUMP_WIDTH);
+  (void)fprintf(stream, "%*s  %s\n", padding, "", ascii);
+
+  (void)pthread_spin_unlock(&_lock);
+}
+#endif
+
 void mem_nuke(void) {
   _free(_mem);
   _size = 0;
